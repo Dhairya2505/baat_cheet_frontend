@@ -16,7 +16,12 @@ import { BACKEND_URI } from "@/app/constants"
 
 export default function SignUpPage() {
   const router = useRouter()
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    email: string,
+    username: string,
+    password: string,
+    confirmpassword: string
+  }>({
     email: "",
     username: "",
     password: "",
@@ -119,7 +124,7 @@ export default function SignUpPage() {
                             : "text"
                       }
                       id={field}
-                      value={formData[field]}
+                      value={formData[field as keyof typeof formData]}
                       onChange={handleChange}
                       className="w-full bg-gray-700 border-gray-600 text-gray-100 pr-10"
                     />
