@@ -14,18 +14,18 @@ export default function UserList({ users, currentUsername, onUserClick }: UserLi
   return (
     <div className="h-[calc(100vh-200px)] overflow-y-auto">
       {Object.entries(users).map(
-        ([username, _], index) =>
-          username !== currentUsername && (
+        (userObject, index) =>
+          userObject[0] !== currentUsername && (
             <motion.div
-              key={username}
+              key={userObject[0]}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
               className="flex items-center text-white border-b border-gray-700 p-4 cursor-pointer hover:bg-gray-700 transition-colors"
-              onClick={() => onUserClick(username)}
+              onClick={() => onUserClick(userObject[0])}
             >
               <div className="w-4/5">
-                <div className="text-lg font-semibold">{username}</div>
+                <div className="text-lg font-semibold">{userObject[0]}</div>
                 <div className="text-sm text-gray-400">Click to start chatting</div>
               </div>
             </motion.div>

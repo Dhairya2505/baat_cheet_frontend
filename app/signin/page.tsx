@@ -43,7 +43,7 @@ export default function SignInPage() {
         } else {
           setError(`*${res.data.message}`)
       }
-    } catch (_) {
+    } catch {
       setError("*An error occurred. Please try again.")
       
     }
