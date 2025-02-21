@@ -1,2 +1,2 @@
-export const BACKEND_CHAT_SERVER = "wss://baat-cheet-backend-l2p3.onrender.com"
-export const BACKEND_URI = "https://baat-cheet-backend-l2p3.onrender.com"
+export const BACKEND_CHAT_SERVER = "wss://baatcheetbackend-production.up.railway.app/"
+export const BACKEND_URI = "https://baatcheetbackend-production.up.railway.app/"
