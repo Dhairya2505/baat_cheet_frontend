@@ -9,7 +9,7 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-import { BACKEND_ROOM_CHAT_SERVER, BACKEND_URI } from "@/app/constants"
+import { BACKEND_CHAT_SERVER, BACKEND_URI } from "@/app/constants"
 import axios from "axios"
 
 export default function RoomChatPage() {
@@ -46,11 +46,11 @@ export default function RoomChatPage() {
             setRoomName(room_name)
         }
 
-        const newSocket = new WebSocket(BACKEND_ROOM_CHAT_SERVER);
+        const newSocket = new WebSocket(BACKEND_CHAT_SERVER);
         
         newSocket.onopen = () => {
             const data = {
-                event: "token",
+                event: "room-token",
                 username: response.data.data,
                 room_id,
                 room_name
@@ -59,7 +59,7 @@ export default function RoomChatPage() {
             
 
             const data2 = {
-                event: "get-chats",
+                event: "get-room-chats",
                 room_id
             }
             newSocket.send(JSON.stringify(data2)); 
@@ -68,15 +68,14 @@ export default function RoomChatPage() {
         newSocket.onmessage = (message) => {
             const data = JSON.parse(message.data)
             switch (data.event) {
-                case "recieve-chats":
+                case "recieve-room-chats":
                   setChats(data.chats)
                   break;
                 
-                case "recieve-message":
+                case "recieve-room-message":
                     const room = data.roomID
                     const from = data._from;
                     const message = data.message;
-                    console.log(room, from, message)
                     if(room_id == room){
                         setChats((prevChats) => [...prevChats, {[from]: message}])
                     }
@@ -122,7 +121,7 @@ export default function RoomChatPage() {
     e.preventDefault()
     if (message && socket && room_id && room_name) {
       const data = {
-        event: "send-message",
+        event: "send-room-message",
         username: userName,
         room_id,
         room_name,
