@@ -63,7 +63,7 @@ export default function SignUpPage() {
         } else {
             setError(`*${res.data.message}`)
         }
-      } catch (err) {
+      } catch (_) {
         setError("*An error occurred. Please try again.")
       }
     }

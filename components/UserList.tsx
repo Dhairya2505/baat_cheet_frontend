@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 
-type user = { [key: string]: any }
+type user = { [key: string]: WebSocket }
 
 interface UserListProps {
   users: user
@@ -14,7 +14,7 @@ export default function UserList({ users, currentUsername, onUserClick }: UserLi
   return (
     <div className="h-[calc(100vh-200px)] overflow-y-auto">
       {Object.entries(users).map(
-        ([username, value], index) =>
+        ([username, _], index) =>
           username !== currentUsername && (
             <motion.div
               key={username}

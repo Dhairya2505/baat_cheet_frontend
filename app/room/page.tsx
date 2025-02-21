@@ -115,7 +115,7 @@ export default function RoomChatPage() {
         }
     };
 
-  }, [room_id, router])
+  }, [room_id, router, room_name, socket, userName])
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault()

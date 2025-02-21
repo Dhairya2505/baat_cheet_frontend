@@ -78,7 +78,7 @@ export default function Home() {
         };
       } catch (error) {
         
-        // toast
+        console.log(error)
       
       }
     };
@@ -95,7 +95,7 @@ export default function Home() {
         socket.close();
       }
     };
-  }, []);
+  }, [router, socket, username]);
 
 
   const createRoom = () => {

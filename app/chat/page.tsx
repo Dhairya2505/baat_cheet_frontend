@@ -68,7 +68,6 @@ export default function ChatPage() {
                 case "recieve-chat":
                     const from = data.from;
                     const message = data.message;
-                    const to = data.to
                     if(from == ToUsername){
                       setChats((prevChats) => [...prevChats, {[from]: message}])
                     }
@@ -105,7 +104,7 @@ export default function ChatPage() {
       }
   };
 
-  }, [ToUsername, username])
+  }, [ToUsername, username, router, socket])
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault()
