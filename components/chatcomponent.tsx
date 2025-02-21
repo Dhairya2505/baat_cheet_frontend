@@ -7,9 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import axios from "axios"
-import { BACKEND_URI } from "../constants"
-
-import { BACKEND_CHAT_SERVER } from "../constants"
+import { BACKEND_URI, BACKEND_CHAT_SERVER } from "@/app/constants"
 
 export default function Chat_Component () {
     
