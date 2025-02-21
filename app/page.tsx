@@ -14,10 +14,13 @@ import UserList from "@/components/UserList"
 import CreateRoomModal from "@/components/CreateRoomModal"
 import JoinRoomModal from "@/components/JoinRoomModal"
 import { BACKEND_CHAT_SERVER, BACKEND_URI } from "@/app/constants"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import GroupList from "@/components/GroupList"
 
 export default function Home() {
   const router = useRouter()
   const [users, setUsers] = useState({})
+  const [groups, setGroups] = useState({})
   const [username, setUsername] = useState("")
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showJoinModal, setShowJoinModal] = useState(false)
@@ -55,8 +58,9 @@ export default function Home() {
           switch (data.event) {
             case "users":
               setUsers(data.users)
+              setGroups(data.groups)
               break;
-          
+
             default:
               break;
           }
@@ -120,19 +124,55 @@ export default function Home() {
           transition={{ duration: 0.3 }}
           className="w-full max-w-2xl border border-gray-700 rounded-lg p-5 shadow-lg bg-gray-800"
         >
-          <div className="flex mb-4">
+          {/* <div className="flex mb-4">
             <Input type="text" placeholder="Search users..." className="w-full bg-gray-700 text-white border-gray-600" />
             <Button variant="outline" size="icon">
               <IoSearchSharp className="h-4 w-4 text-black" />
             </Button>
-          </div>
-          <UserList
-            users={users}
-            currentUsername={username}
-            onUserClick={(toUsername) => {
-              router.push(`/chat?to=${toUsername}`)
-            }}
-          />
+          </div> */}
+          <Tabs defaultValue="users" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="groups">Groups</TabsTrigger>
+          </TabsList>
+          <TabsContent value="users">
+            <div className="flex mb-4">
+              <Input
+                type="text"
+                placeholder="Search users..."
+                className="w-full bg-gray-700 text-white border-gray-600"
+              />
+              <Button variant="outline" size="icon">
+                <IoSearchSharp className="h-4 w-4 text-white" />
+              </Button>
+            </div>
+            <UserList
+              users={users}
+              currentUsername={username}
+              onUserClick={(toUsername) => {
+                router.push(`/chat?to=${toUsername}`)
+              }}
+            />
+          </TabsContent>
+          <TabsContent value="groups">
+            <div className="flex mb-4">
+              <Input
+                type="text"
+                placeholder="Search groups..."
+                className="w-full bg-gray-700 text-white border-gray-600"
+              />
+              <Button variant="outline" size="icon">
+                <IoSearchSharp className="h-4 w-4 text-white" />
+              </Button>
+            </div>
+            <GroupList
+              groups={groups}
+              onGroupClick={(groupId, groupName) => {
+                router.push(`/room?id=${groupId}&room_name=${groupName}`)
+              }}
+            />
+          </TabsContent>
+        </Tabs>
         </motion.div>
         {showCreateModal && (
           <CreateRoomModal
