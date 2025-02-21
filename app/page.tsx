@@ -139,15 +139,15 @@ export default function Home() {
             onClose={() => setShowCreateModal(false)}
             onCreateRoom={(roomName) => {
               const id = nanoid(20)
-              router.push(`/room/${id}?name=${roomName}`)
+              router.push(`/room?id=${id}&room_name=${roomName}`)
             }}
           />
         )}
         {showJoinModal && (
           <JoinRoomModal
             onClose={() => setShowJoinModal(false)}
-            onJoinRoom={(roomId) => {
-              router.push(`/room/${roomId}`)
+            onJoinRoom={(roomId, roomName) => {
+              router.push(`/room?id=${roomId}&room_name=${roomName}`)
             }}
           />
         )}

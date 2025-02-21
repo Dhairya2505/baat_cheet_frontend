@@ -2,26 +2,27 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+
+import { BACKEND_ROOM_CHAT_SERVER, BACKEND_URI } from "@/app/constants"
 import axios from "axios"
-import { BACKEND_URI } from "../constants"
 
-import { BACKEND_CHAT_SERVER } from "../constants"
-
-export default function ChatPage() {
+export default function RoomChatPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const [username, setUsername] = useState("");
   const [message, setMessage] = useState("")
+  const [userName, setUsername] = useState("")
   const [chats, setChats] = useState<{[key: string]: string}[]>([])
+  const [roomName, setRoomName] = useState("")
   const [socket, setSocket] = useState<WebSocket | null>(null)
+  const searchParams = useSearchParams()
 
-  const ToUsername = searchParams.get("to")
+  const room_id = searchParams.get("id")
+  const room_name = searchParams.get("room_name");
 
   useEffect(() => {
 
@@ -35,28 +36,34 @@ export default function ChatPage() {
             return;
         }
 
-        if (!(ToUsername)) {
-          router.push("/")
-          return;
+        if(!room_id){
+            router.push("/");
+            return;
         }
-        setUsername(response.data.data);
-        const newSocket = new WebSocket(BACKEND_CHAT_SERVER);
 
+        setUsername(response.data.data);
+        if(room_name){
+            setRoomName(room_name)
+        }
+
+        const newSocket = new WebSocket(BACKEND_ROOM_CHAT_SERVER);
+        
         newSocket.onopen = () => {
             const data = {
                 event: "token",
-                username: response.data.data
+                username: response.data.data,
+                room_id,
+                room_name
             }
             newSocket.send(JSON.stringify(data)); 
             
 
             const data2 = {
-              event: "get-chats",
-              from_user: response.data.data,
-              to_user: ToUsername
+                event: "get-chats",
+                room_id
             }
             newSocket.send(JSON.stringify(data2)); 
-          };
+        };
 
         newSocket.onmessage = (message) => {
             const data = JSON.parse(message.data)
@@ -65,62 +72,63 @@ export default function ChatPage() {
                   setChats(data.chats)
                   break;
                 
-                case "recieve-chat":
-                    const from = data.from;
+                case "recieve-message":
+                    const room = data.roomID
+                    const from = data._from;
                     const message = data.message;
-                    const to = data.to
-                    if(from == ToUsername){
-                      setChats((prevChats) => [...prevChats, {[from]: message}])
+                    console.log(room, from, message)
+                    if(room_id == room){
+                        setChats((prevChats) => [...prevChats, {[from]: message}])
                     }
-                    break;
 
                 default:
                   break;
               }
 
         }
-    
+
         setSocket(newSocket)
-    
+
         return () => {
             const data = {
-              event: "close",
-              username
+            event: "close",
+            username: userName,
+            room_id
             }
             newSocket.send(JSON.stringify(data));
             newSocket.close();
-        };
+        }
+
 
     }
-    connectSocket();
-    
-    return () => {
-      if(socket){
-        const data = {
-          event: "close",
-          username
-        }
-        socket.send(JSON.stringify(data));
-        socket.close();
-      }
-  };
 
-  }, [ToUsername, username])
+    connectSocket();
+
+    return () => {
+        if(socket){
+          const data = {
+            event: "close",
+            username: userName,
+            room_id
+          }
+          socket.send(JSON.stringify(data));
+          socket.close();
+        }
+    };
+
+  }, [room_id, router])
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault()
-    if (message && socket) {
-        const data = {
-            event: "send-message",
-            to: ToUsername,
-            from: username,
-            message
-        }
+    if (message && socket && room_id && room_name) {
+      const data = {
+        event: "send-message",
+        username: userName,
+        room_id,
+        room_name,
+        message
+      }
       socket.send(JSON.stringify(data))
-      setChats((prevChats) => [
-        ...prevChats,
-        { [username]: message },
-      ])
       setMessage("")
     }
   }
@@ -140,7 +148,9 @@ export default function ChatPage() {
         <Button variant="ghost" size="icon" className="ml-2" onClick={() => router.push("/")}>
           <ArrowLeft className="h-6 w-6" />
         </Button>
-        <h1 className="text-xl font-semibold ml-4">{ToUsername}</h1>
+        <h1 className="text-xl font-semibold ml-4">
+          {roomName} <span className="text-sm text-gray-400 ml-2">{room_id}</span>
+        </h1>
       </motion.div>
 
       <motion.div
@@ -149,29 +159,26 @@ export default function ChatPage() {
         className="flex-grow overflow-y-auto pt-20 pb-24 px-4"
       >
         <AnimatePresence>
-          {chats.map((chat, index) => (
-            Object.entries(chat).map(([user, msg]) => {
+          {chats.map((chatObj, index) => (
+            Object.entries(chatObj).map(([key, message]) => {
                 return <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className={`mb-4 ${user === username ? "text-right" : "text-left"}`}
-            >
-              <div
-                className={`inline-block p-3 rounded-lg ${
-                  user === username ? "bg-purple-600 text-white" : "bg-gray-700 text-gray-100"
-                }`}
-              >
-                {user !== username && (
-                  <p className="font-semibold text-sm mb-1">{user}</p>
-                )}
-                <p>{msg}</p>
-              </div>
-            </motion.div>
-              })
-            
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className={`mb-4 ${key === userName ? "text-right" : "text-left"}`}
+                >
+                <div
+                    className={`inline-block p-3 rounded-lg ${
+                    key === userName ? "bg-purple-600 text-white" : "bg-gray-700 text-gray-100"
+                    }`}
+                >
+                    {key !== userName && <p className="font-semibold text-sm mb-1">{key}</p>}
+                    <p>{message}</p>
+                </div>
+                </motion.div>
+            })
           ))}
         </AnimatePresence>
       </motion.div>

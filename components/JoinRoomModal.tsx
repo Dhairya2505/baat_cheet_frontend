@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button"
 
 interface JoinRoomModalProps {
   onClose: () => void
-  onJoinRoom: (roomId: string) => void
+  onJoinRoom: (roomId: string, roomName: string) => void
 }
 
 export default function JoinRoomModal({ onClose, onJoinRoom }: JoinRoomModalProps) {
   const [roomId, setRoomId] = useState("")
+  const [roomName, setRoomName] = useState("")
 
   return (
     <motion.div
@@ -33,11 +34,18 @@ export default function JoinRoomModal({ onClose, onJoinRoom }: JoinRoomModalProp
           placeholder="Enter room ID"
           className="mb-4"
         />
+        <Input
+          type="text"
+          value={roomName}
+          onChange={(e) => setRoomName(e.target.value)}
+          placeholder="Enter room name"
+          className="mb-4"
+        />
         <div className="flex justify-end space-x-2">
           <Button variant="outline" onClick={onClose} className="text-black">
             Cancel
           </Button>
-          <Button onClick={() => onJoinRoom(roomId)} disabled={!roomId}>
+          <Button onClick={() => onJoinRoom(roomId, roomName)} disabled={!(roomId && roomName)}>
             Join Room
           </Button>
         </div>
