@@ -29,7 +29,8 @@ export default function Home() {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const connectSocket = async () => {
+
+    ( async () => {
       try {
         const response = await axios.get(`${BACKEND_URI}/valid_token`,{
           withCredentials: true
@@ -81,18 +82,17 @@ export default function Home() {
         console.log(error)
       
       }
-    };
-
-    connectSocket();
+    })()
 
     return () => {
-      if (socket) {
+      if(socket && socket.readyState == WebSocket.OPEN){
         const data = {
           event: "close",
           username
         }
         socket.send(JSON.stringify(data));
         socket.close();
+
       }
     };
   }, [router, socket, username]);

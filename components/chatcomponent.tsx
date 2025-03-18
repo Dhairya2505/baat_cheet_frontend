@@ -91,7 +91,7 @@ export default function Chat_Component () {
         connectSocket();
         
         return () => {
-          if(socket){
+          if(socket && socket.readyState == WebSocket.OPEN){
             const data = {
               event: "close",
               username
@@ -101,7 +101,7 @@ export default function Chat_Component () {
           }
       };
     
-      }, [ToUsername, username, router, socket])
+      }, [ToUsername, username, router])
       
     const sendMessage = (e: React.FormEvent) => {
         e.preventDefault()

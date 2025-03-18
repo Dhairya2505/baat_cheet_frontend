@@ -89,16 +89,16 @@ export default function Room_Component() {
         setSocket(newSocket)
 
         return () => {
+          if(socket?.readyState == WebSocket.OPEN){
             const data = {
-            event: "close",
-            username: userName,
-            room_id
+              event: "close",
+              username: userName,
+              room_id
             }
             newSocket.send(JSON.stringify(data));
             newSocket.close();
+          }
         }
-
-
     }
 
     connectSocket();
@@ -115,7 +115,7 @@ export default function Room_Component() {
         }
     };
 
-  }, [room_id, router, room_name, socket, userName])
+  }, [room_id, router, room_name, userName])
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault()
